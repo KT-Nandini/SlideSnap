@@ -22,15 +22,25 @@ jobs:
         run: |
           pip install opencv-python scikit-image pillow pystray pyinstaller
 
-      - name: Build Windows exe
+      - name: Build Windows app
         run: |
           pyinstaller --onefile --windowed --name SlideSnap --icon slidesnap.ico --add-data "slidesnap.ico;." --add-data "camera.png;." slidesnap_final.py
 
-      - name: Upload Windows build
+      - name: Build Windows installer
+        run: |
+          pyinstaller --onefile --windowed --name SlideSnapInstaller --icon slidesnap.ico --add-data "slidesnap.ico;." --add-data "dist/SlideSnap.exe;SlideSnap" installer_bundle.py
+
+      - name: Upload Windows app
         uses: actions/upload-artifact@v4
         with:
-          name: SlideSnap-Windows
+          name: SlideSnap-Windows-App
           path: dist/SlideSnap.exe
+
+      - name: Upload Windows installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlideSnap-Windows-Installer
+          path: dist/SlideSnapInstaller.exe
 
   build-macos:
     runs-on: macos-latest
@@ -50,8 +60,21 @@ jobs:
         run: |
           pyinstaller --onefile --windowed --name SlideSnap --add-data "camera.png:." --add-data "slidesnap.ico:." slidesnap_final.py
 
-      - name: Upload macOS build
+      - name: Create DMG installer
+        run: |
+          mkdir -p dmg_contents
+          cp -r dist/SlideSnap.app dmg_contents/
+          ln -s /Applications dmg_contents/Applications
+          hdiutil create -volname "SlideSnap" -srcfolder dmg_contents -ov -format UDZO dist/SlideSnap.dmg
+
+      - name: Upload macOS app
         uses: actions/upload-artifact@v4
         with:
-          name: SlideSnap-macOS
+          name: SlideSnap-macOS-App
           path: dist/SlideSnap.app
+
+      - name: Upload macOS installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlideSnap-macOS-Installer
+          path: dist/SlideSnap.dmg
