@@ -1,0 +1,57 @@
+name: Build SlideSnap
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install opencv-python scikit-image pillow pystray pyinstaller
+
+      - name: Build Windows exe
+        run: |
+          pyinstaller --onefile --windowed --name SlideSnap --icon slidesnap.ico --add-data "slidesnap.ico;." --add-data "camera.png;." slidesnap_final.py
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlideSnap-Windows
+          path: dist/SlideSnap.exe
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install opencv-python scikit-image pillow pystray pyinstaller
+
+      - name: Build macOS app
+        run: |
+          pyinstaller --onefile --windowed --name SlideSnap --add-data "camera.png:." --add-data "slidesnap.ico:." slidesnap_final.py
+
+      - name: Upload macOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: SlideSnap-macOS
+          path: dist/SlideSnap.app
