@@ -60,21 +60,12 @@ jobs:
         run: |
           pyinstaller --onefile --windowed --name SlideSnap --add-data "camera.png:." --add-data "slidesnap.ico:." slidesnap_final.py
 
-      - name: Create DMG installer
+      - name: Zip macOS app
         run: |
-          mkdir -p dmg_contents
-          cp -r dist/SlideSnap.app dmg_contents/
-          ln -s /Applications dmg_contents/Applications
-          hdiutil create -volname "SlideSnap" -srcfolder dmg_contents -ov -format UDZO dist/SlideSnap.dmg
+          cd dist && zip -r SlideSnap-macOS.zip SlideSnap.app
 
       - name: Upload macOS app
         uses: actions/upload-artifact@v4
         with:
-          name: SlideSnap-macOS-App
-          path: dist/SlideSnap.app
-
-      - name: Upload macOS installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: SlideSnap-macOS-Installer
-          path: dist/SlideSnap.dmg
+          name: SlideSnap-macOS
+          path: dist/SlideSnap-macOS.zip
