@@ -24,7 +24,7 @@ jobs:
 
       - name: Build macOS app
         run: |
-          pyinstaller --onefile --windowed --name SlideSnap --add-data "camera.png:." --add-data "slidesnap.ico:." slidesnap_final.py
+          pyinstaller --onefile --windowed --name SlideSnap --add-data "camera.png:." --add-data "slidesnap.ico:." --osx-bundle-identifier "com.slidesnap.app" --noconsole slidesnap_final.py
 
       - name: Zip macOS app
         run: |
