@@ -28,7 +28,7 @@ jobs:
 
       - name: Zip macOS app
         run: |
-          cd dist && zip -r SlideSnap-macOS.zip SlideSnap.app
+          cd dist && ditto -c -k --keepParent SlideSnap.app SlideSnap-macOS.zip
 
       - name: Upload macOS app
         uses: actions/upload-artifact@v4
