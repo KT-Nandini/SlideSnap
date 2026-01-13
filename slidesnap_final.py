@@ -11,12 +11,17 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 import threading
 from PIL import Image, ImageDraw
-import pystray
 import sys
 import atexit
 import tempfile
 import platform
 import subprocess
+
+# Only import pystray on Windows (causes crashes on macOS)
+if platform.system() == 'Windows':
+    import pystray
+else:
+    pystray = None
 
 # Platform-specific imports for file locking
 if platform.system() == 'Windows':
@@ -420,8 +425,13 @@ class SlideSnapApp:
         )
 
     def setup_tray(self):
-        """Create system tray icon once (with fallback for Linux without tray support)."""
+        """Create system tray icon once (Windows only)."""
         global _tray_icon, _tray_thread
+
+        # Skip tray on macOS/Linux - causes crashes
+        if pystray is None:
+            _tray_icon = None
+            return
 
         try:
             icon_image = create_tray_icon_image()
@@ -437,7 +447,7 @@ class SlideSnapApp:
             _tray_thread = threading.Thread(target=_tray_icon.run, daemon=True)
             _tray_thread.start()
         except Exception:
-            # Tray not supported (some Linux desktops) - app still works
+            # Tray not supported - app still works
             _tray_icon = None
 
     def create_styled_button(self, parent, text, command, primary=False):
